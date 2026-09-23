@@ -35,74 +35,71 @@ class Game {
         const { newRow, rowScore } = this.slideAndMergeRow(this.board[i]);
 
         this.board[i] = newRow;
-
         gained += rowScore;
       }
 
       return gained;
     });
   }
+
   moveRight() {
     return this.processMove(() => {
       let gained = 0;
 
       for (let i = 0; i < this.boardSize; i++) {
         const reversed = [...this.board[i]].reverse();
-
         const { newRow, rowScore } = this.slideAndMergeRow(reversed);
 
         this.board[i] = [...newRow].reverse();
-
         gained += rowScore;
       }
 
       return gained;
     });
   }
+
   moveUp() {
     return this.processMove(() => {
       let gained = 0;
 
-      for (let i = 0; i < this.boardSize; i++) {
-        const column = [];
-
-        for (let j = 0; j < 4; j++) {
-          column.push(this.board[j][i]);
-        }
-
+      for (let c = 0; c < this.boardSize; c++) {
+        const column = [
+          this.board[0][c],
+          this.board[1][c],
+          this.board[2][c],
+          this.board[3][c],
+        ];
         const { newRow, rowScore } = this.slideAndMergeRow(column);
 
-        for (let j = 0; j < 4; j++) {
-          this.board[j][i] = newRow[j];
+        for (let r = 0; r < this.boardSize; r++) {
+          this.board[r][c] = newRow[r];
         }
-
         gained += rowScore;
       }
 
       return gained;
     });
   }
+
   moveDown() {
     return this.processMove(() => {
       let gained = 0;
 
-      for (let i = 0; i < this.boardSize; i++) {
-        const column = [];
+      for (let c = 0; c < this.boardSize; c++) {
+        const column = [
+          this.board[0][c],
+          this.board[1][c],
+          this.board[2][c],
+          this.board[3][c],
+        ];
+        const reversed = [...column].reverse();
 
-        for (let j = 0; j < 4; j++) {
-          column.push(this.board[j][i]);
+        const { newRow, rowScore } = this.slideAndMergeRow(reversed);
+        const finalColumn = [...newRow].reverse();
+
+        for (let r = 0; r < this.boardSize; r++) {
+          this.board[r][c] = finalColumn[r];
         }
-
-        column.reverse();
-
-        const { newRow, rowScore } = this.slideAndMergeRow(column);
-
-        newRow.reverse();
-
-        for (let j = 0; j < 4; j++) {
-          this.board[j][i] = newRow[j];
-        }
-
         gained += rowScore;
       }
 
@@ -126,13 +123,6 @@ class Game {
 
   /**
    * Returns the current game status.
-   *
-   * @returns {string} One of: 'idle', 'playing', 'win', 'lose'
-   *
-   * `idle` - the game has not started yet (the initial state);
-   * `playing` - the game is in progress;
-   * `win` - the game is won;
-   * `lose` - the game is lost
    */
   getStatus() {
     return this.status;
@@ -148,10 +138,8 @@ class Game {
 
     this.status = 'playing';
 
-    if (this.isBoardEmpty()) {
-      this.addRandomTile();
-      this.addRandomTile();
-    }
+    this.addRandomTile();
+    this.addRandomTile();
   }
 
   /**
@@ -166,7 +154,6 @@ class Game {
       : Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 0));
   }
 
-  // Add your own methods here
   isBoardEmpty() {
     return this.board.every((row) => row.every((cell) => cell === 0));
   }
@@ -192,9 +179,7 @@ class Game {
 
   slideAndMergeRow(row) {
     const filtered = row.filter((val) => val !== 0);
-
     const newRow = [];
-
     let rowScore = 0;
 
     for (let i = 0; i < filtered.length; i++) {
@@ -202,9 +187,7 @@ class Game {
         const newValue = filtered[i] * 2;
 
         newRow.push(newValue);
-
         rowScore += newValue;
-
         i++;
       } else {
         newRow.push(filtered[i]);
@@ -236,12 +219,12 @@ class Game {
     }
 
     const beforeBoard = this.board.map((row) => [...row]);
-
     const gainedScore = moveFn();
 
     if (this.boardsEqual(beforeBoard, this.board) === false) {
       this.score += gainedScore;
       this.addRandomTile();
+      this.updateGameStatus();
 
       return true;
     }
@@ -280,4 +263,4 @@ class Game {
   }
 }
 
-module.exports = Game;
+export default Game;

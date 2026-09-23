@@ -1,6 +1,7 @@
 'use strict';
 
-const Game = require('../modules/Game.class');
+import Game from '../modules/Game.class.js';
+
 const game = new Game();
 
 const scoreElement = document.querySelector('.game-score');
@@ -94,3 +95,40 @@ if (mainButton) {
     render();
   });
 }
+
+document.addEventListener('keydown', (e) => {
+  if (game.getStatus() === 'idle') {
+    if (startMessage) {
+      startMessage.classList.add('hidden');
+    }
+    game.start();
+  }
+
+  if (game.getStatus() !== 'playing') {
+    return;
+  }
+
+  let moved = false;
+
+  switch (e.key) {
+    case 'ArrowLeft':
+      moved = game.moveLeft();
+      break;
+    case 'ArrowRight':
+      moved = game.moveRight();
+      break;
+    case 'ArrowUp':
+      moved = game.moveUp();
+      break;
+    case 'ArrowDown':
+      moved = game.moveDown();
+      break;
+    default:
+      return;
+  }
+
+  if (moved) {
+    isFirstMoveMade = true;
+    render();
+  }
+});
